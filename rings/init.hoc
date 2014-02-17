@@ -1,0 +1,43 @@
+load_file("nrngui.hoc")
+load_file("rings.hoc")
+
+nring = 10
+ncell = 10
+invalid = 1
+
+proc do_setup() { local x
+	x = startsw()
+	setup_time = -1
+	run_time = -1
+	invalid = 1
+	doNotify()
+	mkrings(nring, ncell)
+	setup_time = startsw() - x
+	invalid = 0
+}
+
+proc run() {local x
+	if (invalid) { do_setup() }
+	x = startsw()
+	run_time = -1
+	stdinit()
+	continuerun(tstop)
+	run_time = startsw() - x
+}
+
+/*
+xpanel("Individual Ring Performance Runs")
+xpvalue("Number of Rings", &nring, 1, "invalid=1")
+xpvalue("Number of Cells/Ring", &ncell, 1, "invalid=1")
+xpvalue("Number of Compartments/Cell", &ns, 1, "invalid=1")
+xcheckbox("Need to Setup", &invalid, "do_setup()")
+xpvalue("Setup Time (s)", &setup_time)
+xpvalue("Run Time (s)", &run_time)
+xbutton("Run", "run()")
+xpanel(50, 300)
+*/
+mkrings(1,1)
+load_file("rings2.ses")
+
+do_setup()
+

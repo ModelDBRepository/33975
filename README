@@ -1,0 +1,11 @@
+"Independent variable timestep integration of individual neurons for
+network simulations" is a methods paper which demonstrates that
+the local variable step method has better performance than the fixed
+step method for networks in which only a few cells are active at a time.
+
+The files reproduce fig 1 and 3 and provide a test framework for
+observing performance for the worst case Wang and Buzsaki model
+and the best case Ring model.
+
+Michael.Hines@yale.edu should be contacted for comments/questions.
+

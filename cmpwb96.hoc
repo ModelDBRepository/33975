@@ -1,0 +1,45 @@
+objref wbfile, wbsp, wbcell, wbinitv, tobj, wbsort
+wbfile = new File()
+wbfile.ropen("wb96fig3a-5atol.dat")
+tobj = new Vector(wbfile.scanvar)
+tobj.scanf(wbfile, tobj.size)
+wbcell = new Vector()
+wbcell.scanf(wbfile, tobj.size)
+wbinitv = new Vector(100)
+wbinitv.scanf(wbfile, 100)
+
+wbsort = new Vector(100)
+wbsort = wbinitv.sortindex
+wbinitv.sort
+
+objref wbsp[100]
+proc sptimes() {
+	for i=0, 99 {
+		wbsp[i] = new Vector()
+		wbsp[i].index(tobj, wbsp[i].indvwhere(wbcell, "==", wbsort.x[i]))
+	}
+}
+sptimes()
+
+proc vinit() {local i, dv
+        for i = 0, ncell-1 {
+                cells.object(i).soma.v(.5) = wbinitv.x[i]
+        }
+}
+
+vinit()
+
+delaymin = delaydel = 0
+setdel()
+varcur = 0
+mcur = .001
+setfreq()
+
+
+proc cmprun() {local i
+	run()
+	for i=0, ncell-1 {
+		wbsp[i].c.fill(i+1).mark(sp.g, wbsp[i], "|", 7, 2)
+	}
+	sp.g.flush()
+}

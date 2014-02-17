@@ -1,0 +1,17 @@
+load_file("init.hoc")
+load_file("cmpwb96.hoc")
+load_file("test1.ses")
+
+wval=0
+setweight()
+
+
+tstop = 30
+steps_per_ms = 100
+setdt()
+
+tstop=5
+cvode.atol(1e-5)
+cvode_active(1)
+load_file("fitgabaa-5atol.ses")
+

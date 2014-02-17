@@ -1,0 +1,9 @@
+ParmFitness: GABAA[15].g
+	FitnessGenerator: GABAA[15].g
+		RegionFitness:	GABAA[15].g
+
+	Parameters:
+		"NetCon[9816].threshold", -5.6748, -20, 20, 1, 0
+		"Cdur_GABAA", 0.41451, 0.1, 5, 1, 0
+		"NetCon[9816].weight", 1, -10, 10, 0, 0
+End ParmFitness

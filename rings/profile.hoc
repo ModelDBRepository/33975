@@ -1,0 +1,12 @@
+
+load_file("rings.hoc")
+ns = 1
+mkrings(1, 10)
+cvode_local(1)
+mkrings(128, 160)
+print "start run, method ", cvode_active()*(1 + cvode_local())
+xxx = startsw()
+run()
+print startsw() - xxx, " seconds"
+quit()
+

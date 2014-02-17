@@ -1,0 +1,49 @@
+load_file("nrngui.hoc")
+load_file("mulfit.hoc")
+
+proc fig1() {
+	reset()
+	load_file("fig1/localstep.hoc")
+}
+
+proc fig3() {
+	reset()
+	load_file("fitgabaa-5atol.hoc")
+	execute("gengui(0)", MulRunFitter[0].p)
+	MulRunFitter[0].p.run()
+}
+
+proc cmpdewb() {
+	reset()
+	load_file("init.hoc")
+	load_file("cmpwb96.hoc")
+	cmprun()
+}
+
+proc perf() {
+	reset()
+	load_file("init.hoc")
+	run()
+}
+
+proc ringperf() {
+	reset()
+	load_file("rings/init.hoc")
+}
+
+objref vb
+vb = new VBox()
+vb.intercept(1)
+xpanel("Selected Figures")
+xbutton("Fig 1", "fig1()")
+xbutton("Fig 3", "fig3()")
+xbutton("Compare DE model with Wang&Buzsaki fig3a", "cmpdewb()")
+xbutton("General Performance of DE Wang model", "perf()")
+xbutton("Fig 5 Ring Performance", "ringperf()")
+xpanel()
+vb.intercept(0)
+vb.map("Selected Figures")
+
+proc reset() {local i
+	vb.unmap()
+}

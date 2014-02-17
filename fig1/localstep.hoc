@@ -1,0 +1,39 @@
+load_file("nrngui.hoc")
+objref g0, g1
+//g1 = new Graph()
+//g2 = new Graph()
+//g1.save_name("g1")
+//g2.save_name("g2")
+
+load_file("localstep.ses")
+NetCon[2].threshold = -10
+
+objref v0, v1, t0, t1
+v0 = new Vector()
+{v1 = v0.c  t0 = v0.c t1 = v0.c }
+C_Cell[0].soma cvode.record(&v(.5),v0,t0)
+C_Cell[1].soma cvode.record(&v(.5),v1,t1)
+
+cvode.condition_order(2)
+cvode_active(1)
+cvode.atol(.01)
+run()
+
+printf("\nglobal step t0.size=%d\n", t0.size)
+cvode.statistics
+v0.mark(g0,t0,"|",10,1,1)
+v1.mark(g0,t1,"|",10,2,1)
+
+NetCon[2].record("ev()")
+proc ev() {
+	g1.mark(t, -10, "-", 8, 3, 2)
+}
+
+cvode_local(1)
+run()
+
+printf("\nlocal step t0.size=%d t1.size=%d\n", t0.size, t1.size)
+v0.mark(g1,t0,"|",10,1,1)
+v1.mark(g1,t1,"|",10,2,1)
+cvode.statistics
+

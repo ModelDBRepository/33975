@@ -1,0 +1,71 @@
+objref rnd, rvinitvec, rfreqvec, rdelvec
+objref  fhvinit
+rnd = new Random()
+rnd.MCellRan4()
+
+rvinitvec = new Vector(ncell)
+rfreqvec = new Vector(ncell)
+rdelvec = new Vector(nclist.count)
+
+fhvinit = new FInitializeHandler(0, "vinit()")
+
+{
+vinitmin=-68
+vinitmax=-55
+delaymin=0 variable_domain(&delaymin, 0, 100)
+delaydel=0 variable_domain(&delaydel, 0, 100)
+mcur=.001
+varcur=0
+ncact=1
+}
+
+proc ranvinit() {
+	rvinitvec.resize(ncell)
+	rnd.uniform(0,1)
+	rvinitvec.setrand(rnd)
+	rvinitvec.sort
+}
+proc ranfreq() {
+	rfreqvec.resize(ncell)
+	rnd.uniform(-.5,.5)
+	rfreqvec.setrand(rnd)
+	rfreqvec.sort
+	setfreq()
+}
+proc randelay() {
+	rdelvec.resize(nclist.count)
+	rnd.uniform(0,1)
+	rdelvec.setrand(rnd)
+	setdel()
+}
+
+
+proc vinit() {local i, dv
+	dv = vinitmax - vinitmin
+	for i = 0, ncell-1 {
+		cells.object(i).soma.v(.5) = vinitmin + dv*rvinitvec.x[i]
+	}
+}
+
+proc setfreq() { local i
+	for i=0, ncell-1 {
+		cells.object(i).soma.amp_cur = mcur + varcur*rfreqvec.x[i]
+	}
+}
+
+proc setdel() { local i
+	for i=0, nclist.count-1 {
+		nclist.object(i).delay = delaymin + delaydel*rdelvec.x[i]
+	}
+}
+
+proc ncactive() { local i
+	for i=0, nclist.count-1 {
+		nclist.object(i).active(ncact)
+	}
+}
+
+ranvinit()	
+ranfreq()
+randelay()
+ncactive()

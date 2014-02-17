@@ -1,0 +1,131 @@
+// NetGUI default section. Artificial cells, if any, are located here.
+  create acell_home_
+  access acell_home_
+
+//Network cell templates
+//   C_Cell
+
+
+begintemplate C_Cell
+public is_art
+public init, topol, basic_shape, subsets, geom, memb
+public synlist, x, y, z, position, connect2target
+
+public soma
+public all
+
+objref synlist
+
+proc init() {
+  topol()
+  subsets()
+  geom()
+  biophys()
+  geom_nseg()
+  synlist = new List()
+  synapses()
+  x = y = z = 0 // only change via position
+}
+
+create soma
+
+proc topol() { local i
+  basic_shape()
+}
+proc basic_shape() {
+  soma {pt3dclear() pt3dadd(0, 0, 0, 1) pt3dadd(15, 0, 0, 1)}
+}
+
+objref all
+proc subsets() { local i
+  objref all
+  all = new SectionList()
+    soma all.append()
+
+}
+proc geom() {
+  soma {  /*area = 100 */ L = diam = 5.6419  }
+}
+external lambda_f
+proc geom_nseg() {
+  soma area(.5) // make sure diam reflects 3d points
+   soma { nseg = 1  }
+}
+proc biophys() {
+  soma {
+    cm = 1
+    insert pas
+      g_pas = 0.0001
+      e_pas = -65
+    insert kdr
+      gmax_kdr = 0.009
+    insert naf
+      gmax_naf = 0.035
+    insert cur
+      amp_cur = 0.001
+  }
+}
+proc position() { local i
+  soma for i = 0, n3d()-1 {
+    pt3dchange(i, $1-x+x3d(i), $2-y+y3d(i), $3-z+z3d(i), diam3d(i))
+  }
+  x = $1  y = $2  z = $3
+}
+proc connect2target() { //$o1 target point process, $o2 returned NetCon
+  soma $o2 = new NetCon(&v(.5), $o1)
+}
+objref syn_
+proc synapses() {
+  /* G0 */   soma syn_ = new GABAA(0.5)  synlist.append(syn_)
+}
+func is_art() { return 0 }
+
+endtemplate C_Cell
+
+//Network specification interface
+
+objref cells, nclist, netcon, nil
+{cells = new List()  nclist = new List()}
+
+func cell_append() {cells.append($o1)  $o1.position($2,$3,$4)
+	return cells.count - 1
+}
+
+func nc_append() {//srcindex, tarcelindex, synindex
+  if ($3 >= 0) {
+    cells.object($1).connect2target(cells.object($2).synlist.object($3),netcon)
+    netcon.weight = $4   netcon.delay = $5
+  }else{
+    cells.object($1).connect2target(cells.object($2).pp,netcon)
+    netcon.weight = $4   netcon.delay = $5
+  }
+  nclist.append(netcon)
+  netcon = nil
+  return nclist.count - 1
+}
+
+//Network instantiation
+
+ncell = 100
+variable_domain(&ncell, 2, 1e6)
+
+proc makenet() {
+	nclist.remove_all
+	cells.remove_all
+	for i=0, ncell-1 { cell_append(new C_Cell(),	i,	 0, 0) }
+
+    if (1) {
+	for i=0, ncell-1 for j=0, ncell-1 if (i != j) {
+		nc_append(i, j, 0, 1e-4/(ncell - 1), 0)
+	}
+    }else{
+	for i=0, ncell-1 for j=0, ncell-1 {
+		nc_append(i, j, 0, 1e-4/ncell, 0)
+	}
+    }
+	for i=0, nclist.count-1 {
+		nclist.object(i).threshold = -5.67 // fitted to wang 1996
+	}
+	Cdur_GABAA = .4145 // fitted to wang 1996
+}
+makenet()

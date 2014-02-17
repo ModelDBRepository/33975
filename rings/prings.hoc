@@ -1,0 +1,47 @@
+objref g, f, rings, cell, cells, time, times, meth
+g = new Graph()
+f = new File()
+rings = new Vector()
+meth = new Vector()
+cells = new List()
+times = new List()
+
+proc rd() {local n, i, nrold, nr, nc, tt, me
+	f.ropen($s1)
+	n = f.scanvar()
+print n
+	nrold = -1
+	for i=0, n-1 {
+		me = f.scanvar()
+		nr = f.scanvar()
+		nc = f.scanvar()*nr
+		tt = f.scanvar()
+		if (nrold != nr) {
+			rings.append(nr)
+			meth.append(me)
+			cell = new Vector()
+			cells.append(cell)
+			time = new Vector()
+			times.append(time)
+			nrold = nr
+		}
+		cell.append(nc)
+		time.append(tt)
+	}
+	f.close
+}
+
+rd("rings10.dat")
+//rd("rings1.dat")
+
+proc pl() {local i
+	for i=0, cells.count-1 {
+		if (times.object(i).size > 1) {
+times.object(i).c.log10.line(g, cells.object(i).c.log10, 3-meth.x[i], 1)
+		}else{
+times.object(i).c.log10.mark(g, cells.object(i).c.log10, "O", 3-meth.x[i], 1)
+		}
+	}
+}
+
+pl()

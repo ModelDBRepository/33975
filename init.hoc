@@ -1,0 +1,38 @@
+load_file("nrngui.hoc")
+load_file("net1.hoc")
+load_file("vinit.hoc")
+load_file("spkplot.hoc")
+
+proc atolscale() {
+	cvode.atolscale(&GABAA[0].Ron, NetCon[0].weight)
+	cvode.atolscale(&GABAA[0].Roff, NetCon[0].weight)
+}
+atolscale()
+
+proc setweight() {local i
+	for i = 0, nclist.count-1 {
+		nclist.object(i).weight = wval/(ncell - 1)
+	}
+}
+
+order_ = 0
+
+load_file("ctrl1.ses")
+setfreq()
+setdel()
+
+objref sp
+sp = new SpikePlot1(cells)
+
+proc defnet() {
+	sp.unmap()
+	sp = nil
+	makenet()
+	setweight()
+	atolscale()
+	sp = new SpikePlot1(cells)
+	ranfreq()
+	ranvinit()
+	randelay()
+}
+

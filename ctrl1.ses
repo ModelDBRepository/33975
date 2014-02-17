@@ -1,0 +1,96 @@
+load_file("nrngui.hoc")
+objectvar save_window_, rvp_
+objectvar scene_vector_[5]
+objectvar ocbox_, ocbox_list_, scene_, scene_list_
+{ocbox_list_ = new List()  scene_list_ = new List()}
+{pwman_place(0,0,0)}
+{
+xpanel("RunControl", 0)
+v_init = -65
+xvalue("Init","v_init", 1,"stdinit()", 1, 1 )
+xbutton("Init & Run","run()")
+xbutton("Stop","stoprun=1")
+runStopAt = 5
+xvalue("Continue til","runStopAt", 1,"{continuerun(runStopAt) stoprun=1}", 1, 1 )
+runStopIn = 1
+xvalue("Continue for","runStopIn", 1,"{continuerun(t + runStopIn) stoprun=1}", 1, 1 )
+xbutton("Single Step","steprun()")
+t = 500
+xvalue("t","t", 2 )
+tstop = 500
+xvalue("Tstop","tstop", 1,"tstop_changed()", 0, 1 )
+dt = 0.025
+xvalue("dt","dt", 1,"setdt()", 0, 1 )
+steps_per_ms = 40
+xvalue("Points plotted/ms","steps_per_ms", 1,"setdt()", 0, 1 )
+xcheckbox("Quiet",&stdrun_quiet,"")
+realtime = 33
+xvalue("Real Time","realtime", 0,"", 0, 1 )
+xpanel(13,113)
+}
+
+//Begin VariableTimeStep
+{
+ocbox_ = NumericalMethodPanel[0]
+ocbox_ = ocbox_.b1
+ocbox_.map("VariableTimeStep", 14, 511, 272.64, 106.56)
+}
+objref ocbox_
+//End VariableTimeStep
+
+{
+save_window_ = new Graph(0)
+save_window_.size(0,500,-80,40)
+scene_vector_[2] = save_window_
+{save_window_.view(0, -80, 500, 120, 802, 674, 300.48, 200.32)}
+graphList[0].append(save_window_)
+save_window_.save_name("graphList[0].")
+save_window_.addvar("C_Cell[0].soma.v( 0.5 )", 1, 1, 0.515655, 1.03898, 2)
+save_window_.addvar("C_Cell[ncell-1].soma.v( 0.5 )", 2, 1, 0.50607, 1.04377, 2)
+}
+{
+xpanel("Temperature", 0)
+celsius = 37
+xvalue("celsius","celsius", 1,"", 0, 1 )
+xpanel(15,652)
+}
+{
+xpanel("numerics", 0)
+ncell = 100
+xvalue("ncell", "ncell", 1, "defnet()")
+xcheckbox("second order threshold (variable step methods only)",&order_,"cvode.condition_order(order_+1)")
+xradiobutton("fixed step","cvode_active(0)", 1)
+xradiobutton("global variable step","cvode_active(1)")
+xradiobutton("local variable step","cvode_local(1)")
+xcheckbox("NetCons active",&ncact,"ncactive()")
+mcur = 0.001
+xvalue("mean current (sets natural frquency)","mcur", 1,"setfreq()", 0, 0 )
+varcur = 0.0002
+xvalue("current variation (modifies natural frequency)","varcur", 1,"setfreq()", 0, 0 )
+delaymin = 3.5
+xvalue("minimum delay","delaymin", 1,"setdel()", 0, 0 )
+delaydel = 0
+xvalue("max-min delay","delaydel", 1,"setdel()", 0, 0 )
+vinitmin = -68
+xvalue("minimum vinit","vinitmin", 1,"", 0, 0 )
+vinitmax = -55
+xvalue("maximum vinit","vinitmax", 1,"", 0, 0 )
+wval = 1e-4
+xvalue("n*weight","wval", 1,"setweight()", 0, 0 )
+xbutton("Re-randomize frequency","ranfreq()")
+xbutton("Re-randomize vinit","ranvinit()")
+xbutton("Re-randomize delay","randelay()")
+xpanel(309,110)
+}
+{
+save_window_ = new Graph(0)
+save_window_.size(0,500,0,1e-04)
+scene_vector_[4] = save_window_
+{save_window_.view(0, 0, 500, 1e-04, 805, 409, 300.48, 200.32)}
+graphList[2].append(save_window_)
+save_window_.save_name("graphList[2].")
+save_window_.addexpr("C_Cell[0].synlist.object(0).g", 1, 1, 0.359105, 1.00543, 2)
+save_window_.addexpr("C_Cell[ncell-1].synlist.object(0).g", 2, 1, 0.269649, 1.01022, 2)
+}
+objectvar scene_vector_[1]
+{doNotify()}

@@ -1,0 +1,68 @@
+load_file("nrngui.hoc")
+load_file("rings.ses")
+objref g
+g = Graph[0]
+
+ns = 10 // number of segments per cell, changed in nfam
+
+begintemplate Cell
+public soma, connect_pre, nclist, syn
+external ns
+create soma
+objref nclist, syn
+
+proc init() {
+	nclist = new List()
+	create soma
+	soma {
+		nseg=ns
+		L=10
+		diam = 100/(PI*L)
+		insert hh
+		syn = new ExpSyn(0)
+	}
+	
+}
+
+proc connect_pre() {// arg is presynaptic Cell
+	$o1.soma nclist.append( new NetCon(&v(1), syn, -20, 1, .002))
+}
+
+endtemplate Cell
+
+begintemplate Ring
+public cell, stim, ncell
+objref cell[1], stim
+
+proc init() {
+	ncell = $1
+	objref cell[ncell]
+	for i=0, ncell - 1 {
+		cell[i] = new Cell()
+	}
+	access cell[0].soma
+
+	for i=0, ncell-1 {
+		cell[(i+1)%ncell].connect_pre(cell[i])
+	}
+	stim = new IClamp(.5)
+	stim.del = 0
+	stim.dur = .1
+	stim.amp = .3
+}
+
+endtemplate Ring
+
+objref ring[1]
+nring=0
+
+proc mkrings() {local i
+	nring=$1
+	objref ring[$1]
+	for i=0, $1-1 {
+		ring[i] = new Ring($2)
+	}
+	g.erase_all()
+	g.addvar("ring[nring-1].cell[0].soma.v(.5)")
+}
+tstop = 500

@@ -1,0 +1,66 @@
+{load_file("nrngui.hoc")}
+objectvar save_window_, rvp_
+objectvar scene_vector_[3]
+objectvar ocbox_, ocbox_list_, scene_, scene_list_
+{ocbox_list_ = new List()  scene_list_ = new List()}
+{pwman_place(0,0,0)}
+{
+xpanel("Individual Ring Performance Runs", 0)
+nring = 2
+xvalue("Number of Rings","nring", 1,"invalid=1", 0, 1 )
+ncell = 100
+xvalue("Number of Cells/Ring","ncell", 1,"invalid=1", 0, 1 )
+ns = 10
+xvalue("Number of Compartments/Cell","ns", 1,"invalid=1", 0, 1 )
+xcheckbox("Need to Setup",&invalid,"do_setup()")
+setup_time = 0
+xvalue("Setup Time (s)","setup_time", 0,"", 0, 1 )
+run_time = -1
+xvalue("Run Time (s)","run_time", 0,"", 0, 1 )
+xbutton("Run","run()")
+xpanel(51,105)
+}
+{
+xpanel("RunControl", 0)
+v_init = -65
+xvalue("Init","v_init", 1,"stdinit()", 1, 1 )
+xbutton("Init & Run","run()")
+xbutton("Stop","stoprun=1")
+runStopAt = 5
+xvalue("Continue til","runStopAt", 1,"{continuerun(runStopAt) stoprun=1}", 1, 1 )
+runStopIn = 1
+xvalue("Continue for","runStopIn", 1,"{continuerun(t + runStopIn) stoprun=1}", 1, 1 )
+xbutton("Single Step","steprun()")
+t = 500
+xvalue("t","t", 2 )
+tstop = 500
+xvalue("Tstop","tstop", 1,"tstop_changed()", 0, 1 )
+dt = 0.025
+xvalue("dt","dt", 1,"setdt()", 0, 1 )
+steps_per_ms = 40
+xvalue("Points plotted/ms","steps_per_ms", 1,"setdt()", 0, 1 )
+xcheckbox("Quiet",&stdrun_quiet,"")
+realtime = 0
+xvalue("Real Time","realtime", 0,"", 0, 1 )
+xpanel(89,352)
+}
+
+//Begin VariableTimeStep
+{
+ocbox_ = NumericalMethodPanel[0]
+}
+{object_push(ocbox_)}
+{
+dtsav = dt
+atol_ = 0.001  CVode[0].atol(atol_)
+restore(1301, 2)
+}
+{object_pop()}
+{
+ocbox_.map("VariableTimeStep", 88, 746, 272.64, 113.28)
+}
+objref ocbox_
+//End VariableTimeStep
+
+objectvar scene_vector_[1]
+{doNotify()}
