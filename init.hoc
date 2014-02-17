@@ -4,8 +4,8 @@ load_file("vinit.hoc")
 load_file("spkplot.hoc")
 
 proc atolscale() {
-	cvode.atolscale(&GABAA[0].Ron, NetCon[0].weight)
-	cvode.atolscale(&GABAA[0].Roff, NetCon[0].weight)
+	cvode.atolscale("GABAA.Ron", NetCon[0].weight)
+	cvode.atolscale("GABAA.Roff", NetCon[0].weight)
 }
 atolscale()
 
